@@ -24,7 +24,7 @@ subreddit = reddit.subreddit('wallstreetbets')
 # rising_topics = subreddit.rising(limit=50)
 # trending_topics = subreddit.rising(limit=50)
 
-hot_topics = list(subreddit.hot(limit=500))
+hot_topics = list(subreddit.hot(limit=None))
 
 potential_stock_names = [] 
 trending_stock_names =  []
@@ -81,9 +81,18 @@ for stock in trending_stock_names:
             trending_stocks_rank[stock] = newScoreCard 
 
 
+#  {AAPL: {score: xx}}  
+#    
+
+# list of dict
+sorted_stocks = []
 
 for stock in trending_stocks_rank:
-    print(stock, trending_stocks_rank[stock])
+    
+
+    print(stock,trending_stocks_rank[stock])
+
+
 
 
 

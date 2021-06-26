@@ -26,7 +26,7 @@ Steps:
 3. Calculate rankings of stocks in list based on postiive interaction 
 
 
-Step 1 :  
+Step 1 (Completed) :  
  - Pull stock names from headlines, verify that stock actually exists, then add to a list of stock names trending in the current API pull 
  - tickers are usually 3 to 4 capital letters 
  - iterate through x characters, check if all caps, if so make api request to verify , if true add to list of stock names trending in wsb 
@@ -34,13 +34,23 @@ Step 1 :
 - ticker name criteria: 1 - 7 characters, could start with a $ sign, ignore .s 
 
 
+Step 2: 
+- Add comments to the stock ranking list
+- Order stocks based on score
 
-- Bug: could pull valid ticker names not related to article
+
+Step 3:
+- Build React site 
+- Pull every day at 9:30AM
+- Create firebase realtimedb
+- schedule cronjab with ec2 instance
+
 
 
 Current Task:
-- validate ticker names using the excel sheet
-- also import the excel names using pandas for verification 
+- Rank stocks based on score, and upvote ratio
+- store comments in a list in the stock ranking object
+-  
 
 
 
