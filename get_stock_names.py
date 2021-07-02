@@ -24,7 +24,7 @@ subreddit = reddit.subreddit('wallstreetbets')
 # rising_topics = subreddit.rising(limit=50)
 # trending_topics = subreddit.rising(limit=50)
 
-hot_topics = list(subreddit.hot(limit=300))
+hot_topics = list(subreddit.hot(limit=10))
 
 potential_stock_names = [] 
 trending_stock_names =  []
@@ -56,7 +56,8 @@ trending_stock_names = list(set(trending_stock_names)) # eliminate duplicates
 trending_stocks_rank =  {}
 
 for stock in trending_stock_names:
-    trending_stocks_rank[stock] = {'comments': 0, 'upvote_ratio':0, 'score':0}
+    trending_stocks_rank[stock] = {'comments': 0, 'upvote_ratio':0, 'score':0, 'downs':0, "ups": 0, "headlines": []}  
+
 
 
 # ex of trending stocks =   { AMC: {comments: y, upvotes: x } }
@@ -74,9 +75,20 @@ for stock in trending_stock_names:
         if stock in headline:
             
             previousScoreCard = trending_stocks_rank[stock]
+            print(previousScoreCard)
+
             new_comments = previousScoreCard['comments'] + len(post.comments)
             new_upvote_ratio = previousScoreCard['upvote_ratio'] + post.upvote_ratio
             new_score = previousScoreCard['score']  + post.score
+            new_ups = previousScoreCard['ups'] + post.ups
+            new_downs = previousScoreCard['downs'] + post.downs
+            previous_headlines = previousScoreCard['headlines']
+
+            print("prev headlines\n"  ,previous_headlines)
+            
+            head_line_dict = {"headline": post.title, "url": post.url}                          
+            previous_headlines.append(head_line_dict)
+            new_headlines = previous_headlines
             
             newScoreCard = {}
         
@@ -84,20 +96,19 @@ for stock in trending_stock_names:
             newScoreCard['upvote_ratio']  = new_upvote_ratio
             newScoreCard['score']  = new_score
             newScoreCard['tickerName'] = stock
-
+            newScoreCard['ups'] = new_ups
+            newScoreCard['downs'] = new_downs
+            newScoreCard['headlines'] = new_headlines
 
             trending_stocks_rank[stock] = newScoreCard 
 
 
-#  [{"Apple Inc": {score: xx, tickerName: , numberComments:      }}]   
-#    
+#  [{"Apple Inc": {score: xx, tickerName: , numberComments: }}]   
+ 
 
 # list of dict
 stock_object_list = []
 sorted_stocks = []
-
-# print(stock_df.head())
-
 
 def insertion_sort_impl(L, *, key):
     for i in range(1, len(L)): # loop-invariant: `L[:i]` is sorted
@@ -110,7 +121,7 @@ def insertion_sort_impl(L, *, key):
             j -= 1
         L[j + 1] = d
 
-#  {"CI"  {'comments': 6, 'upvote_ratio': 0.63, 'score': 8} }}
+
 for stock in trending_stocks_rank:
     
     encoded_name = stock.encode('utf-8')
