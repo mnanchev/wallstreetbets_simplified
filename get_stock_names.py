@@ -24,12 +24,18 @@ subreddit = reddit.subreddit('wallstreetbets')
 # rising_topics = subreddit.rising(limit=50)
 # trending_topics = subreddit.rising(limit=50)
 
-hot_topics = list(subreddit.hot(limit=None))
+hot_topics = list(subreddit.hot(limit=300))
 
 potential_stock_names = [] 
 trending_stock_names =  []
 
 stock_names_list = pd.read_csv('stock-names-sheet.csv')['Name'].tolist()
+full_stock_names_list = pd.read_csv('stock-names-sheet.csv')['FullName'].tolist()
+
+
+d =  {"Name": stock_names_list,  "FullName": full_stock_names_list  }
+stock_df = pd.DataFrame(d)
+stock_df['Name'] = stock_df['Name'].astype('|S')
 
 for topic in hot_topics:
 
@@ -77,20 +83,58 @@ for stock in trending_stock_names:
             newScoreCard['comments']  = new_comments
             newScoreCard['upvote_ratio']  = new_upvote_ratio
             newScoreCard['score']  = new_score
+            newScoreCard['tickerName'] = stock
+
 
             trending_stocks_rank[stock] = newScoreCard 
 
 
-#  {AAPL: {score: xx}}  
+#  [{"Apple Inc": {score: xx, tickerName: , numberComments:      }}]   
 #    
 
 # list of dict
+stock_object_list = []
 sorted_stocks = []
 
+# print(stock_df.head())
+
+
+def insertion_sort_impl(L, *, key):
+    for i in range(1, len(L)): # loop-invariant: `L[:i]` is sorted
+        d = L[i]
+        for j in range(i - 1, -1, -1): 
+            if key(L[j]) <= key(d): 
+               break
+            L[j + 1] = L[j]
+        else: # `key(L[j]) > key(d)` for all `j`
+            j -= 1
+        L[j + 1] = d
+
+#  {"CI"  {'comments': 6, 'upvote_ratio': 0.63, 'score': 8} }}
 for stock in trending_stocks_rank:
     
+    encoded_name = stock.encode('utf-8')
+    # df.loc[df['column_name'] == 'value']
+    full_row =  stock_df.loc[stock_df['Name'] == encoded_name  ]
+    full_name =  list(full_row['FullName'])[0]
+    print("\n")
 
-    print(stock,trending_stocks_rank[stock])
+    new_stock_dict = {}
+    raw_stock_object = trending_stocks_rank[stock]     
+    new_stock_dict[full_name] = raw_stock_object     
+    stock_object_list.append(new_stock_dict)
+
+
+insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) # sort by `d` key
+stock_object_list.reverse()
+
+for x in stock_object_list:
+    print(x)
+
+
+
+
+
 
 
 
