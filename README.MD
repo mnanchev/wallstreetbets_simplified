@@ -48,9 +48,10 @@ Step 3:
 
 
 Current Task:
-- Rank stocks based on score, and upvote ratio
-- store comments in a list in the stock ranking object
--  
+-  Build Website
+-  Run Python Script on interval using CronTab
+-  Write information to Firebase
+-
 
 
 
