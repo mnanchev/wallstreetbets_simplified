@@ -7,7 +7,7 @@ import json
 
 # requires a Reddit account and developer App
 username = 'steve55677'
-password = 'dickface1'
+password = ''
 userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
@@ -142,7 +142,7 @@ def getData():
 
 
 def writeToFireBase():
-    url = 'https://somedomain.com'
+    url = 'https://wsbsimplified-default-rtdb.firebaseio.com/'
     body = {'name': 'Maryja'}
     headers = {'content-type': 'application/json'}
 
