@@ -7,7 +7,14 @@ import json
 
 # requires a Reddit account and developer App
 username = 'steve55677'
-password = ''
+# r'C:\Users\walee\Desktop\redditpass.txt'
+
+# f = open('C:\Users\walee\Desktop\redditpass.txt', "r").readline()
+# print(f.readline())
+
+
+password = open('C:\\Users\\walee\\Desktop\\redditpass.txt', "r").read()
+
 userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
@@ -32,7 +39,7 @@ def getData():
     # rising_topics = subreddit.rising(limit=50)
     # trending_topics = subreddit.rising(limit=50)
 
-    hot_topics = list(subreddit.hot(limit=None))
+    hot_topics = list(subreddit.hot(limit=10))
 
     potential_stock_names = [] 
     trending_stock_names =  []
@@ -140,6 +147,7 @@ def getData():
     insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) # sort by `d` key
     stock_object_list.reverse()
 
+    
 
 def writeToFireBase():
     url = 'https://wsbsimplified-default-rtdb.firebaseio.com/'
