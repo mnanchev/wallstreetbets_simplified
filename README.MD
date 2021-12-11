@@ -1,4 +1,4 @@
-
+qa
 
 Objective: To automate the functionality of wsb reddit form
 
@@ -19,39 +19,10 @@ How to Automate This:
 3. use a brokerage api to execute trades automatically
 4. Divest after realizing x gains ....
 
-
 Steps:
 1. Find a way to extract stock names / tickers from headlines 
 2. create a list of all stock names found per API request 
 3. Calculate rankings of stocks in list based on postiive interaction 
-
-
-Step 1 (Completed) :  
- - Pull stock names from headlines, verify that stock actually exists, then add to a list of stock names trending in the current API pull 
- - tickers are usually 3 to 4 capital letters 
- - iterate through x characters, check if all caps, if so make api request to verify , if true add to list of stock names trending in wsb 
-
-- ticker name criteria: 1 - 7 characters, could start with a $ sign, ignore .s 
-
-
-Step 2: 
-- Add comments to the stock ranking list
-- Order stocks based on score
-
-
-Step 3:
-- Build React site 
-- Pull every day at 9:30AM
-- Create firebase realtimedb
-- schedule cronjab with ec2 instance
-
-
-
-Current Task:
--  Build Website
--  Run Python Script on interval using CronTab
--  Write information to Firebase
--
 
 
 

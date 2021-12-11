@@ -3,7 +3,12 @@ import pandas as pd
 import time 
 import requests
 import json
+import re
+import datetime
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # requires a Reddit account and developer App
 username = 'steve55677'
@@ -13,33 +18,28 @@ username = 'steve55677'
 # print(f.readline())
 
 
-password = open('C:\\Users\\walee\\Desktop\\redditpass.txt', "r").read()
+password = 'dickface1'
+
 
 userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
 start_time = time.time()
 
-
-# enter chcp 65001 on cmd prompt to resolve charmap isssues for windows users
-
-
-
+# enter chcp 65001 on cmd prompt to resolve charmap isssues on windows
 
 def getData():
     # gets information from r/wallstreetbets
 
     # create reddit instance with OAuth2
     reddit = praw.Reddit(client_id = clientId, client_secret = secretKey , username=username, password=password, user_agent=userAgent)
-
     subreddit = reddit.subreddit('wallstreetbets')
-
 
     # join all of this data together and then remove any duplicate values
     # rising_topics = subreddit.rising(limit=50)
-    # trending_topics = subreddit.rising(limit=50)
+    # trending_topics = subreddit.rising(limit=500)
 
-    hot_topics = list(subreddit.hot(limit=10))
+    trending_topics = list(subreddit.hot(limit=50))
 
     potential_stock_names = [] 
     trending_stock_names =  []
@@ -52,7 +52,7 @@ def getData():
     stock_df = pd.DataFrame(d)
     stock_df['Name'] = stock_df['Name'].astype('|S')
 
-    for topic in hot_topics:
+    for topic in trending_topics:
 
         headline = topic.title # ex :"Daily Popular Tickers Thread for June 16, 2021 - AMC | CLNE | DKNG"    
         # assuming stock names are 1 - 5 characters long, and all caps
@@ -60,9 +60,7 @@ def getData():
             try:
                 currentCharacterSelection = headline[i:i+5].replace(" ", "")            
                 if(currentCharacterSelection.isupper() and currentCharacterSelection.isalnum()):
-            
                     if currentCharacterSelection in stock_names_list:
-                        
                         trending_stock_names.append(currentCharacterSelection)
             except:
                 pass
@@ -73,25 +71,26 @@ def getData():
     for stock in trending_stock_names:
         trending_stocks_rank[stock] = {'comments': 0, 'upvote_ratio':0, 'score':0, 'downs':0, "ups": 0, "headlines": []}  
 
-
-
     # ex of trending stocks =   { AMC: {comments: y, upvotes: x } }
     # rank trending stock names based on engagement
     # we are assuming that the higher a upvote ratio and score
     # the higher ranking the stock, or more upside potential for stock gains
 
     for stock in trending_stock_names:
-        
-        # for loop not being executed
-        for post in hot_topics:
+        for post in trending_topics:
             headline = post.title
             # if the stock name is mentioned in the headline, the posts engagement can be used to rank the relevenacy of the stock name in wall street bets 
             
-            if stock in headline:
-                
-                previousScoreCard = trending_stocks_rank[stock]
-               
+            # /?asdjbasdfjbasd/ - sees whether candidate ticker
 
+            # if (candidate)
+
+                # then check in csv if (csv[ticker] exists?) => proceed
+        #   
+
+            if stock in headline:
+            
+                previousScoreCard = trending_stocks_rank[stock]
                 new_comments = previousScoreCard['comments'] + len(post.comments)
                 new_upvote_ratio = previousScoreCard['upvote_ratio'] + post.upvote_ratio
                 new_score = previousScoreCard['score']  + post.score
@@ -147,7 +146,8 @@ def getData():
     insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) # sort by `d` key
     stock_object_list.reverse()
 
-    
+    return stock_object_list    
+        
 
 def writeToFireBase():
     url = 'https://wsbsimplified-default-rtdb.firebaseio.com/'
@@ -159,22 +159,13 @@ def writeToFireBase():
 
 
 if __name__ == "__main__":
-    getData()
+    with open('stock_data.json', 'w', encoding='utf-8') as f:
+        stock_data_array = getData()
+        json.dump(stock_data_array, f)
+        
+        data = str(stock_data_array)
+        f.write(str(data.encode('UTF-8')))
+  
 
-
+logger.info("Your cron function ran at " + str(current_time))
 print("--- %s seconds ---" % (time.time() - start_time))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
