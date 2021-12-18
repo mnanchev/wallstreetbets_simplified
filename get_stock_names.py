@@ -1,61 +1,40 @@
 import praw
-import pandas as pd
-import time 
+import pandas as pd 
 import requests
 import json
 import re
-import datetime
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 # requires a Reddit account and developer App
 username = 'steve55677'
-# r'C:\Users\walee\Desktop\redditpass.txt'
-
-# f = open('C:\Users\walee\Desktop\redditpass.txt', "r").readline()
-# print(f.readline())
-
-
 password = 'dickface1'
-
-
 userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
-start_time = time.time()
 
 # enter chcp 65001 on cmd prompt to resolve charmap isssues on windows
 
 def getData():
-    # gets information from r/wallstreetbets
+    '''
+    
+    uses the reddit api to get information from r/wallstreetbets
 
-    # create reddit instance with OAuth2
+    '''
+        # create reddit instance with OAuth2
     reddit = praw.Reddit(client_id = clientId, client_secret = secretKey , username=username, password=password, user_agent=userAgent)
     subreddit = reddit.subreddit('wallstreetbets')
-
-    # join all of this data together and then remove any duplicate values
-    # rising_topics = subreddit.rising(limit=50)
-    # trending_topics = subreddit.rising(limit=500)
-
-    trending_topics = list(subreddit.hot(limit=50))
-
+    trending_topics = list(subreddit.hot(limit=10))
     potential_stock_names = [] 
     trending_stock_names =  []
-
     stock_names_list = pd.read_csv('stock-names-sheet.csv')['Name'].tolist()
     full_stock_names_list = pd.read_csv('stock-names-sheet.csv')['FullName'].tolist()
-
-
     d =  {"Name": stock_names_list,  "FullName": full_stock_names_list  }
     stock_df = pd.DataFrame(d)
     stock_df['Name'] = stock_df['Name'].astype('|S')
 
     for topic in trending_topics:
-
-        headline = topic.title # ex :"Daily Popular Tickers Thread for June 16, 2021 - AMC | CLNE | DKNG"    
+        # ex :"Daily Popular Tickers Thread for June 16, 2021 - AMC | CLNE | DKNG"    
         # assuming stock names are 1 - 5 characters long, and all caps
+        headline = topic.title 
         for i in range(len(headline)):
             try:
                 currentCharacterSelection = headline[i:i+5].replace(" ", "")            
@@ -78,18 +57,8 @@ def getData():
 
     for stock in trending_stock_names:
         for post in trending_topics:
-            headline = post.title
-            # if the stock name is mentioned in the headline, the posts engagement can be used to rank the relevenacy of the stock name in wall street bets 
-            
-            # /?asdjbasdfjbasd/ - sees whether candidate ticker
-
-            # if (candidate)
-
-                # then check in csv if (csv[ticker] exists?) => proceed
-        #   
-
+            headline = post.title            
             if stock in headline:
-            
                 previousScoreCard = trending_stocks_rank[stock]
                 new_comments = previousScoreCard['comments'] + len(post.comments)
                 new_upvote_ratio = previousScoreCard['upvote_ratio'] + post.upvote_ratio
@@ -100,9 +69,7 @@ def getData():
                 head_line_dict = {"headline": post.title, "url": post.url}                          
                 previous_headlines.append(head_line_dict)
                 new_headlines = previous_headlines
-                
                 newScoreCard = {}
-            
                 newScoreCard['comments']  = new_comments
                 newScoreCard['upvote_ratio']  = new_upvote_ratio
                 newScoreCard['score']  = new_score
@@ -110,62 +77,57 @@ def getData():
                 newScoreCard['ups'] = new_ups
                 newScoreCard['downs'] = new_downs
                 newScoreCard['headlines'] = new_headlines
-
                 trending_stocks_rank[stock] = newScoreCard 
-
-
     # list of dict
     stock_object_list = []
     sorted_stocks = []
 
     def insertion_sort_impl(L, *, key):
-        for i in range(1, len(L)): # loop-invariant: `L[:i]` is sorted
+        # loop-invariant: `L[:i]` is sorted
+        for i in range(1, len(L)):
             d = L[i]
             for j in range(i - 1, -1, -1): 
                 if key(L[j]) <= key(d): 
 
                      break
                 L[j + 1] = L[j]
-            else: # `key(L[j]) > key(d)` for all `j`
+            else: 
                 j -= 1
             L[j + 1] = d
 
-
-    for stock in trending_stocks_rank:
-        
+    for stock in trending_stocks_rank:       
         encoded_name = stock.encode('utf-8')
-        # df.loc[df['column_name'] == 'value']
         full_row =  stock_df.loc[stock_df['Name'] == encoded_name  ]
         full_name =  list(full_row['FullName'])[0]
         new_stock_dict = {}
-        raw_stock_object = trending_stocks_rank[stock]     
+        raw_stock_object = trending_stocks_rank[stock]
+        raw_stock_object['full_name'] = full_name     
         new_stock_dict[full_name] = raw_stock_object     
         stock_object_list.append(new_stock_dict)
 
-
-    insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) # sort by `d` key
+    # sort by `d` key
+    insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) 
     stock_object_list.reverse()
-
     return stock_object_list    
         
+def print_to_excel(stock_data): 
+    # we want a summary excel sheet that lists each stock name
+    # then we want a sheet for each stock and its data 
+    stock_df = pd.DataFrame()
 
-def writeToFireBase():
-    url = 'https://wsbsimplified-default-rtdb.firebaseio.com/'
-    body = {'name': 'Maryja'}
-    headers = {'content-type': 'application/json'}
-
-    r = requests.post(url, data=json.dumps(body), headers=headers)
-
-
+    for i in range(len(stock_data)):
+        for key in stock_data[i]:
+            stock_df = stock_df.append(stock_data[i][key], ignore_index=True)
+    
+    stock_df.to_excel(r'C:\Users\User\Desktop\export_dataframe.xlsx', index = False, header=True)
+    # print(stock_df.head())
 
 if __name__ == "__main__":
-    with open('stock_data.json', 'w', encoding='utf-8') as f:
-        stock_data_array = getData()
-        json.dump(stock_data_array, f)
-        
-        data = str(stock_data_array)
-        f.write(str(data.encode('UTF-8')))
-  
+    stock_data_array = getData()
+    # print(stock_data_array)
+    print_to_excel(stock_data_array)
 
-logger.info("Your cron function ran at " + str(current_time))
-print("--- %s seconds ---" % (time.time() - start_time))
+    
+
+
+
