@@ -1,8 +1,5 @@
 import praw
 import pandas as pd 
-import requests
-import json
-import re
 
 # requires a Reddit account and developer App
 username = 'steve55677'
@@ -15,14 +12,12 @@ secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
 
 def getData():
     '''
-    
     uses the reddit api to get information from r/wallstreetbets
-
     '''
-        # create reddit instance with OAuth2
+    # create reddit instance with OAuth2
     reddit = praw.Reddit(client_id = clientId, client_secret = secretKey , username=username, password=password, user_agent=userAgent)
     subreddit = reddit.subreddit('wallstreetbets')
-    trending_topics = list(subreddit.hot(limit=10))
+    trending_topics = list(subreddit.hot(limit=None))
     potential_stock_names = [] 
     trending_stock_names =  []
     stock_names_list = pd.read_csv('stock-names-sheet.csv')['Name'].tolist()
@@ -70,6 +65,12 @@ def getData():
                 previous_headlines.append(head_line_dict)
                 new_headlines = previous_headlines
                 newScoreCard = {}
+
+                encoded_name = stock.encode('utf-8')
+                full_row =  stock_df.loc[stock_df['Name'] == encoded_name]
+                full_name =  list(full_row['FullName'])[0]
+
+                newScoreCard['company_name'] = full_name
                 newScoreCard['comments']  = new_comments
                 newScoreCard['upvote_ratio']  = new_upvote_ratio
                 newScoreCard['score']  = new_score
@@ -80,8 +81,7 @@ def getData():
                 trending_stocks_rank[stock] = newScoreCard 
     # list of dict
     stock_object_list = []
-    sorted_stocks = []
-
+    
     def insertion_sort_impl(L, *, key):
         # loop-invariant: `L[:i]` is sorted
         for i in range(1, len(L)):
@@ -97,37 +97,43 @@ def getData():
 
     for stock in trending_stocks_rank:       
         encoded_name = stock.encode('utf-8')
-        full_row =  stock_df.loc[stock_df['Name'] == encoded_name  ]
+        full_row =  stock_df.loc[stock_df['Name'] == encoded_name]
         full_name =  list(full_row['FullName'])[0]
         new_stock_dict = {}
         raw_stock_object = trending_stocks_rank[stock]
-        raw_stock_object['full_name'] = full_name     
+        # raw_stock_object['full_name'] = full_name     
         new_stock_dict[full_name] = raw_stock_object     
         stock_object_list.append(new_stock_dict)
 
     # sort by `d` key
-    insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']  ) 
+    insertion_sort_impl(stock_object_list, key=lambda x:  x[list(x.keys())[0]]['score']) 
     stock_object_list.reverse()
     return stock_object_list    
         
-def print_to_excel(stock_data): 
-    # we want a summary excel sheet that lists each stock name
-    # then we want a sheet for each stock and its data 
-    stock_df = pd.DataFrame()
+def print_to_excel(stock_data):
+    summary_df = pd.DataFrame()
 
     for i in range(len(stock_data)):
         for key in stock_data[i]:
-            stock_df = stock_df.append(stock_data[i][key], ignore_index=True)
-    
-    stock_df.to_excel(r'C:\Users\User\Desktop\export_dataframe.xlsx', index = False, header=True)
-    # print(stock_df.head())
+            summary_df = summary_df.append(stock_data[i][key], ignore_index=True)
+
+    with pd.ExcelWriter('wsb_simplified.xlsx') as writer:
+        summary_df.to_excel(writer, index=False, sheet_name='ranks')
+        for stock in stock_data:
+            current_stock_name = list(stock.keys())[0]
+            headline_list = stock[current_stock_name]['headlines']
+            headline_name_column_list = []
+            headline_url_column_list = []
+
+            for headline_object in headline_list:
+                headline_name = headline_object['headline']
+                headline_url = headline_object['url']
+                headline_name_column_list.append(headline_name)
+                headline_url_column_list.append(headline_url)
+            current_stock_df = pd.DataFrame(list(zip(headline_name_column_list, headline_url_column_list)),columns =['Post Name', 'Post URL'])  
+            current_stock_df.reset_index()
+            current_stock_df.to_excel(writer, index=False, sheet_name=current_stock_name[0:29])
 
 if __name__ == "__main__":
     stock_data_array = getData()
-    # print(stock_data_array)
     print_to_excel(stock_data_array)
-
-    
-
-
-
