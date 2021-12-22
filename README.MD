@@ -6,7 +6,9 @@ How To Use:
 
 2. run "pip installl -r requirements.txt" in directory or vitualenv
 
-3. run "python get_stock_names.py" in terminal 
+3. run "python main.py" in terminal 
+
+4. Open the wsb simplified Excel sheet for results
 
 
 
