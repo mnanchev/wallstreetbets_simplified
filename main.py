@@ -1,5 +1,8 @@
 import praw
 import pandas as pd 
+import time 
+
+
 
 # requires a Reddit account and developer App
 username = 'steve55677'
@@ -8,12 +11,20 @@ userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
 
-# enter chcp 65001 on cmd prompt to resolve charmap isssues on windows
 
+print('\n')
+print("Do not exit terminal this will take a few minutes <3")
+
+# enter chcp 65001 on cmd prompt to resolve charmap isssues on windows
 def getData():
     '''
     uses the reddit api to get information from r/wallstreetbets
+
+    /subreddit end point returns a subreddit object
+
+    the hot attribute contains the most recent posts in the sub reddit 
     '''
+
     # create reddit instance with OAuth2
     reddit = praw.Reddit(client_id = clientId, client_secret = secretKey , username=username, password=password, user_agent=userAgent)
     subreddit = reddit.subreddit('wallstreetbets')
@@ -26,10 +37,12 @@ def getData():
     stock_df = pd.DataFrame(d)
     stock_df['Name'] = stock_df['Name'].astype('|S')
 
+    # ex :"Daily Popular Tickers Thread for June 16, 2021 - AMC | CLNE | DKNG"    
+    # assuming stock names are 1 - 5 characters long, and all caps
     for topic in trending_topics:
-        # ex :"Daily Popular Tickers Thread for June 16, 2021 - AMC | CLNE | DKNG"    
-        # assuming stock names are 1 - 5 characters long, and all caps
-        headline = topic.title 
+      
+        headline = topic.title
+         
         for i in range(len(headline)):
             try:
                 currentCharacterSelection = headline[i:i+5].replace(" ", "")            
@@ -39,7 +52,19 @@ def getData():
             except:
                 pass
 
-    trending_stock_names = list(set(trending_stock_names)) # eliminate duplicates
+    # holds all trending stock ticker names 
+    trending_stock_names = list(set(trending_stock_names)) # eliminate duplicates with set
+    print("\nI've identified",   len(trending_stock_names), "Trending companies From", len(trending_topics), 'Reddit posts\n') 
+    time.sleep(5)
+
+    for stock in trending_stock_names:
+        encoded_name = stock.encode('utf-8')
+        full_row =  stock_df.loc[stock_df['Name'] == encoded_name]
+        full_name =  list(full_row['FullName'])[0]
+        time.sleep(0.1)
+        print(full_name)
+
+    print("\nLet me build your Excel summary this will take a few minutes")
     trending_stocks_rank =  {}
 
     for stock in trending_stock_names:
@@ -51,9 +76,14 @@ def getData():
     # the higher ranking the stock, or more upside potential for stock gains
 
     for stock in trending_stock_names:
+        encoded_name = stock.encode('utf-8')
+        full_row =  stock_df.loc[stock_df['Name'] == encoded_name]
+        full_name =  list(full_row['FullName'])[0]
+       
         for post in trending_topics:
-            headline = post.title            
-            if stock in headline:
+            headline = post.title.replace(" ", "")     
+         
+            if stock in headline or full_name in headline:
                 previousScoreCard = trending_stocks_rank[stock]
                 new_comments = previousScoreCard['comments'] + len(post.comments)
                 new_upvote_ratio = previousScoreCard['upvote_ratio'] + post.upvote_ratio
@@ -64,12 +94,8 @@ def getData():
                 head_line_dict = {"headline": post.title, "url": post.url}                          
                 previous_headlines.append(head_line_dict)
                 new_headlines = previous_headlines
+                
                 newScoreCard = {}
-
-                encoded_name = stock.encode('utf-8')
-                full_row =  stock_df.loc[stock_df['Name'] == encoded_name]
-                full_name =  list(full_row['FullName'])[0]
-
                 newScoreCard['company_name'] = full_name
                 newScoreCard['comments']  = new_comments
                 newScoreCard['upvote_ratio']  = new_upvote_ratio
@@ -137,3 +163,4 @@ def print_to_excel(stock_data):
 if __name__ == "__main__":
     stock_data_array = getData()
     print_to_excel(stock_data_array)
+    print("Finished :)")

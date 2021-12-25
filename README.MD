@@ -39,13 +39,14 @@ Alternative Strategy:
 2. try to invest in trending assets before eventual crash 
 
 
-Project Steps:
+To-Do
+- empty lists or stocks appear with no headline list issue
+- fix printing to Excel issues
+- dynamic for users including directory specific code + adding in user password to script
+ 
 
-1. Find a way to extract stock names / tickers from headlines 
 
-2. create a list of all stock names found per API request 
 
-3. Calculate rankings of stocks in list based on postiive interaction 
 
 
 
