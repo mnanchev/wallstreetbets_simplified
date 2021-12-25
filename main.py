@@ -2,11 +2,9 @@ import praw
 import pandas as pd 
 import time 
 
-
-
 # requires a Reddit account and developer App
 username = 'steve55677'
-password = 'dickface1'
+password = "-----"
 userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
