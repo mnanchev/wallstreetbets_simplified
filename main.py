@@ -9,7 +9,6 @@ userAgent = 'wsbscraper' # can be random string
 clientId = 'ouT0A38wSJwpaQ'
 secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
 
-
 print('\n')
 print("Do not exit terminal this will take a few minutes <3")
 
