@@ -2,10 +2,11 @@
 
 #### How To Use:
 
-1. Clone Repo 
-2. run "pip installl -r requirements.txt" in directory or vitualenv
-3. run "python main.py" in terminal 
-4. Open the wsb simplified Excel sheet for results
+1. Created Reddit account and get api key, [guide here:](https://towardsdatascience.com/how-to-use-the-reddit-api-in-python-5e05ddfd1e5c)
+2. Clone Repo
+3. run "pip installl -r requirements.txt" in directory or vitualenv
+4. run "python main.py" in terminal 
+5. Open the wsb simplified Excel sheet for results
 
 #### How People Use WSB:
 

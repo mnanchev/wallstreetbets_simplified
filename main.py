@@ -3,11 +3,11 @@ import pandas as pd
 import time 
 
 # requires a Reddit account and developer App
-username = 'steve55677'
-password = "-----"
+username = ''
+password = ''
 userAgent = 'wsbscraper' # can be random string
-clientId = 'ouT0A38wSJwpaQ'
-secretKey = 'CYkJCA_osUfnYxEX8jZKFMaJrCaH5g'
+clientId = ''
+secretKey = ''
 
 print('\n')
 print("Do not exit terminal this will take a few minutes <3")
