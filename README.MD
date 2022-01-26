@@ -5,7 +5,7 @@
 1. Created Reddit account and get api keys, [guide here](https://towardsdatascience.com/how-to-use-the-reddit-api-in-python-5e05ddfd1e5c)
 2. Clone Repo or download as zip and unzip folder to desktop
 3. fill in main.py with your reddit info 
-4. run "python main.py" in terminal while in working directory
+4. run "python main.py" in terminal while in working directory and wait
 5. Open the wsb simplified Excel sheet for results
 
 ## How People Use WSB:
