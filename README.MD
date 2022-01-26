@@ -12,7 +12,8 @@
 
 1. read through different posts
 2. people find hot stocks to invest in 
-3. people make money in the short term
+3. the price of these stocks explodes in the short term while investors are rushing to buy
+4. sell before the stock eventually crashes
 
 
 ## Automation Possibility:
